@@ -12,8 +12,9 @@ The encrypted values are returned as a box with all the values needed to decrypt
 ```go
 
 // generate a key
-key := crypto.Key()
-key.Generate()
+key := crypto.Key{}
+err := key.Generate()
+handleError(err)
 
 // encrypt you a payload
 ciphertext, err := key.Encrypt([]byte("hello, world!"))
