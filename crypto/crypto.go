@@ -88,7 +88,6 @@ func (k *Key) decrypt(sb *secretBoxedMessage) ([]byte, error) {
 
 // Bytes returns the key in [32]byte form
 func (k *Key) Bytes() [32]byte {
-	// castedKey := [32]byte(*k)
 	return [32]byte(*k)
 }
 
