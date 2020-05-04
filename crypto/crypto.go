@@ -29,7 +29,7 @@ func (k *Key) Generate() error {
 
 // String returns a string version of the key
 func (k *Key) String() string {
-	return fmt.Sprintf("%x", k.array())
+	return fmt.Sprintf("%x", k.Bytes())
 }
 
 // Encrypt takes a plaintext message in byte slice format and returns an encrypted message.
@@ -54,7 +54,8 @@ func (k *Key) encrypt(message []byte) (*secretBoxedMessage, error) {
 		return nil, err
 	}
 
-	out := secretbox.Seal(nil, message, &nonce, k.array())
+	key := k.Bytes()
+	out := secretbox.Seal(nil, message, &nonce, &key)
 
 	return &secretBoxedMessage{
 		SchemaVersion: 1,
@@ -76,7 +77,8 @@ func (k *Key) Decrypt(message []byte) ([]byte, error) {
 }
 
 func (k *Key) decrypt(sb *secretBoxedMessage) ([]byte, error) {
-	decrypted, valid := secretbox.Open(nil, sb.Box, &sb.Nonce, k.array())
+	key := k.Bytes()
+	decrypted, valid := secretbox.Open(nil, sb.Box, &sb.Nonce, &key)
 	if !valid {
 		return nil, ErrDecryption
 	}
@@ -84,9 +86,10 @@ func (k *Key) decrypt(sb *secretBoxedMessage) ([]byte, error) {
 	return decrypted, nil
 }
 
-func (k *Key) array() *[32]byte {
-	castedKey := [32]byte(*k)
-	return &castedKey
+// Bytes returns the key in [32]byte form
+func (k *Key) Bytes() [32]byte {
+	// castedKey := [32]byte(*k)
+	return [32]byte(*k)
 }
 
 func generateNonce() ([24]byte, error) {
